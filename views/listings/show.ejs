@@ -38,7 +38,7 @@
     <form action="/listings/<%= listing.id %>/reviews" method="POST" novalidate class= "needs-validation">
         
         <div class="mb-3 mt-3">
-            <label for="rating "class="form-label"> Rating </label>
+            <label for="rating"class="form-label"> Rating </label>
             <fieldset class="starability-slot">
             <input type="radio" id="no-rate" class="input-no-rate" name="review[rating]" value="1" checked aria-label="No rating." />
             <input type="radio" id="first-rate1" name="review[rating]" value="1" />
@@ -82,9 +82,11 @@
                 <p class="card-text"><%=review.comment%></p>
                 
             </div>
+            <% if( currUser && currUser._id.equals(review.author._id)){%>
             <form method="POST" action="/listings/<%= listing._id%>/reviews/<%=review._id%>?_method=DELETE">
                 <button class="btn btn-sm btn-dark mb-3">Delete</button>
             </form>
+            <%}%>
          </div>
 </div>
 <%}%>
