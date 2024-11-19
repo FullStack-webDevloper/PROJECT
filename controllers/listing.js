@@ -4,10 +4,36 @@ const Listing= require("../models/listing");
 // const geocodingClient =mbxGeocoding({accessToken:mapToken});
 
 
-module.exports.index=async(req, res)=>{
-    const allListings=await Listing.find({});
-    res.render("listings/index.ejs",{ allListings });
-     };
+module.exports.index= async (req, res) => {
+    const { category, location } = req.query;  
+    
+    let filter = {};
+  
+ 
+    if (category) {
+      filter.category = category.trim(); 
+    }
+ 
+    if (location) {
+      filter.location = { $regex: location, $options: 'i' };
+    }
+
+  
+    try {
+    
+      const allListings = await Listing.find(filter);
+  
+      if (allListings.length === 0) {
+        req.flash("error", "No listings found for the specified location.");
+      }
+  
+      res.render("listings/index", { allListings, selectedCategory: category, searchLocation: location });
+    } catch (error) {
+      console.error("Error fetching listings:", error);
+      res.status(500).send("Error fetching listings");
+    }
+  };
+  
 
      module.exports.renderNewForm =( req , res )=>{
     

@@ -23,6 +23,17 @@
         
     </div> -->
     <div class="mb-3">
+        <label for="category" class="form-label">Category:</label>
+        <select class="form-select" name="listing[category]" id="category" required>
+            <option value="" disabled selected>Select a category</option>
+            <option value="Castles">Castles</option>
+            <option value="Iconic Cities">Iconic Cities</option>
+            <option value="Rooms">Rooms</option>
+            <option value="Mountains">Mountains</option>
+            <option value="Amazing Pools">Amazing Pools</option>
+        </select>
+    </div>
+    <div class="mb-3">
         <label for="image" class="form-label">Upload a Image</label>
         <input name="listing[image]"  type="file"class="form-control" required>
         

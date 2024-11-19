@@ -26,55 +26,67 @@
        
 
     </style>
+   <form class="d-flex  " role="search" method="GET" action="/listings">
+    <input class="form-control me-2 mt-3" type="search" name="location" placeholder="Search your rooms by Location" value="<%= searchLocation || '' %>" aria-label="Search">
+    <button class="btn btn-outline-danger mt-3" type="submit">Search</button>
+  </form>
+  
     
 
     <div id="filters">
         <nav class="navbar navbar-expand-md bg-body-light border-bottom sticky-top">
-            <div class="container-fluid">
-        <i class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" >
-            <span class="navbar-toggler-icon"></span>
-        
-        </i>
-        <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
-        <div class="filter">
-            <div>
-               <i class="fa-solid fa-fire"></i> <p>Trending</p></div>
+          <div class="container-fluid">
+            <!-- <i class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup">
+              <span class="navbar-toggler-icon"></span>
+            </i> -->
+            <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+              <!-- <div class="filter">
+                <a href="/listings?category=Trending" class="<%= selectedCategory === 'Trending' ? 'active' : '' %>">
+                  <i class="fa-solid fa-fire"></i> <p>Trending</p>
+                </a>
+              </div> -->
+              
+              <div class="filter">
+                <a href="/listings?category=Rooms" class="<%= selectedCategory === 'Rooms' ? 'active' : '' %>">
+                  <i class="fa-solid fa-bed"></i><p>Rooms</p>
+                </a>
               </div>
-
-            <div class="filter">
-            <div>
-               <i class="fa-solid fa-bed"></i><p>Rooms</p></div>
+              
+              <div class="filter">
+                <a href="/listings?category=Iconic Cities" class="<%= selectedCategory === 'Iconic Cities' ? 'active' : '' %>">
+                  <i class="fa-solid fa-mountain-city"></i><p>Iconic Cities</p>
+                </a>
+              </div>
+      
+              <div class="filter">
+                <a href="/listings?category=Mountains" class="<%= selectedCategory === 'Mountains' ? 'active' : '' %>">
+                  <i class="fa-solid fa-mountain"></i> <p>Mountains</p>
+                </a>
+              </div>
+      
+              <div class="filter">
+                <a href="/listings?category=Castles" class="<%= selectedCategory === 'Castles' ? 'active' : '' %>">
+                  <i class="fa-brands fa-fort-awesome"></i> <p>Castles</p>
+                </a>
+              </div>
+      
+              <div class="filter">
+                <a href="/listings?category=Amazing Pools" class="<%= selectedCategory === 'Amazing Pools' ? 'active' : '' %>">
+                  <i class="fa-solid fa-person-swimming"></i><p>Amazing Pools</p>
+                </a>
+              </div>
             </div>
-
-             <div class="filter"> 
-             <div>
-                <i class="fa-solid fa-mountain-city"></i><p>Iconic Cities</p></div>
-             </div>
-
-              <div class="filter">
-              <div>
-                <i class="fa-solid fa-mountain"></i> <p>Mountains</p></div>
-               </div>
-
-              <div class="filter">
-              <div>
-                <i class="fa-brands fa-fort-awesome"></i>  <p>Castles</p></div>
-              </div> 
-
-              <div class="filter">
-              <div>
-              <i class="fa-solid fa-person-swimming"></i><p>Amazing Pools</p</div>
-              </div>
-<!-- 
-              <div class="filter">
-              <div>
-                <i class="fa-solid fa-mountain-city"></i><p>Iconic Cities</p></div>
-            </div> -->
-        </div>
-        </div>    
+          </div>
         </nav>
-    </div>
-    
+      </div>
+      
+      <% if (searchLocation) { %>
+        <p>Search Results for "<%= searchLocation %>":</p>
+      <% } %>
+      
+      <% if (allListings.length === 0) { %>
+        <p>No listings found for this location.</p>
+      <% } %>
 
 
     <div class="row row-cols-lg-3 row-cols-md-2 row-cols-sm-1 mt-3">
