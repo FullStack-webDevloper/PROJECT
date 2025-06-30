@@ -112,7 +112,7 @@ app.use("/",userRouter);
 //         country:"India",
 //     });
 // })
-console.log("GEMINI_SECRET present:", !!process.env.GEMINI_SECRET);
+// console.log("GEMINI_SECRET present:", !!process.env.GEMINI_SECRET);
 
 const ai =new GoogleGenAI ({
   apiKey: process.env.GEMINI_SECRET,
