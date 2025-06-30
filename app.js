@@ -23,7 +23,9 @@ const User= require("./models/user.js");
 const listingRouter= require("./routes/listing.js");
 const reviewRouter= require("./routes/review.js");
 const userRouter= require("./routes/user.js");
-
+const { GoogleGenAI  } = require("@google/genai");
+const cors = require("cors");
+const bodyParser = require("body-parser");
 
 // const MONGO_URL="mongodb://127.0.0.1:27017/wanderlust";
 const dbUrl= process.env.ATLASDB_URL;
@@ -84,6 +86,8 @@ passport.use(new LocalStrategy(User.authenticate()));
 
 passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
+app.use(cors());
+app.use(bodyParser.json());
 
 
 app.use((req, res,next)=>{
@@ -108,6 +112,32 @@ app.use("/",userRouter);
 //         country:"India",
 //     });
 // })
+const ai =new GoogleGenAI ({
+  apiKey: process.env.GEMINI_SECRET,
+});
+
+app.post("/ask-gemini", async (req, res) => {
+  const userMessage = req.body.message;
+  console.log("User message:", userMessage);
+
+  try {
+   const response = await ai.models.generateContent({
+      model: "gemini-2.5-flash",
+      contents: [{ role: "user", parts: [{ text: userMessage }] }],
+      config: {
+        thinkingConfig: { thinkingBudget: 0 }
+      }
+    });
+
+    const reply = response.text;
+    console.log("Gemini reply:", reply);
+    res.json({ reply });
+  } catch (error) {
+    console.error("Gemini error:", error);
+    res.status(500).json({ reply: "Something went wrong with Gemini." });
+  }
+});
+
 app.all("*",(req ,res, next)=>{
 next(new ExpressError(404,"page not found"));
 });
@@ -115,8 +145,10 @@ app.use((err,req,res,next)=>{
     let {statusCode=500, message="something went wrong"}=err;
    res.status(statusCode).render("error.ejs", {message});
 
-    // res.status(statusCode).send(message);
 });
+
+
+
 app.listen(8080 ,()=>{
     console.log("sever is listening to port 8080");
 });
