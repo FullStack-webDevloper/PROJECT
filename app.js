@@ -112,34 +112,6 @@ app.use("/",userRouter);
 //         country:"India",
 //     });
 // })
-// console.log("GEMINI_SECRET present:", !!process.env.GEMINI_SECRET);
-
-const ai =new GoogleGenAI ({
-  apiKey: process.env.GEMINI_SECRET,
-});
-
-app.post("/ask-gemini", async (req, res) => {
-  const userMessage = req.body.message;
-  console.log("User message:", userMessage);
-
-  try {
-   const response = await ai.models.generateContent({
-      model: "gemini-2.5-flash",
-      contents: [{ role: "user", parts: [{ text: userMessage }] }],
-      config: {
-        thinkingConfig: { thinkingBudget: 0 }
-      }
-    });
-
-    const reply = response.text;
-    console.log("Gemini reply:", reply);
-    res.json({ reply });
-  } catch (error) {
-    console.error("Gemini error:", error);
-    res.status(500).json({ reply: "Something went wrong with Gemini." });
-  }
-});
-
 app.all("*",(req ,res, next)=>{
 next(new ExpressError(404,"page not found"));
 });
