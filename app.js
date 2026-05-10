@@ -84,6 +84,13 @@ app.use(flash());
 app.use(passport.initialize());
 app.use(passport.session());
 passport.use(new LocalStrategy(User.authenticate()));
+app.use((req, res, next) => {
+
+    res.locals.currUser = req.user;
+
+    next();
+
+});
 
 passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
@@ -114,29 +121,119 @@ app.use("/",userRouter);
 //         country:"India",
 //     });
 // })
-const ai =new GoogleGenAI ({
-  apiKey: process.env.GEMINI_SECRET,
+// const model = new ChatGoogleGenerativeAI({
+//   model: "gemini-2.5-flash",
+//   apiKey: process.env.GEMINI_API_KEY,
+// });
+
+
+// Gemini Model
+const model = new ChatGoogleGenerativeAI({
+
+    model: "gemini-2.5-flash",
+
+    apiKey: process.env.GEMINI_API_KEY,
+
+});
+
+
+// AI Route
+app.post("/ask-gemini", async (req, res) => {
+
+    try {
+
+        const userMessage = req.body.message;
+
+        console.log("User Question:", userMessage);
+
+
+        // Fetch listings from DB
+        const listings = await Listing.find({}).limit(10);
+
+
+        // Convert listings into text context
+        const listingData = listings.map((listing) => `
+
+Title: ${listing.title}
+
+Description: ${listing.description}
+
+Location: ${listing.location}, ${listing.country}
+
+Category: ${listing.category}
+
+Price: ₹${listing.price}
+
+        `).join("\n");
+
+
+        // Prompt
+        const prompt = `
+
+You are an intelligent AI travel assistant.
+
+Below are available listings from the website:
+
+${listingData}
+
+User Question:
+${userMessage}
+
+Instructions:
+- Recommend listings according to category, price, and location
+- Answer naturally
+- Use ONLY provided listing data
+- If no listing matches, say it politely
+
+        `;
+
+
+        // AI Response
+        const response = await model.invoke(prompt);
+
+
+        console.log(response.content);
+
+
+        res.json({
+            reply: response.content,
+        });
+
+    }
+
+    catch (error) {
+
+        console.log(error);
+
+        res.status(500).json({
+            reply: "Something went wrong",
+        });
+
+    }
+
 });
 
 app.post("/ask-gemini", async (req, res) => {
   const userMessage = req.body.message;
+
   console.log("User message:", userMessage);
 
   try {
-   const response = await ai.models.generateContent({
-      model: "gemini-2.5-flash",
-      contents: [{ role: "user", parts: [{ text: userMessage }] }],
-      config: {
-        thinkingConfig: { thinkingBudget: 0 }
-      }
+    // LangChain call
+    const response = await model.invoke(userMessage);
+
+    console.log("Gemini reply:", response.content);
+
+    res.json({
+      reply: response.content,
     });
 
-    const reply = response.text;
-    console.log("Gemini reply:", reply);
-    res.json({ reply });
   } catch (error) {
     console.error("Gemini error:", error);
-    res.status(500).json({ reply: "Something went wrong with Gemini." });
+
+    res.status(500).json({
+      reply: "Something went wrong with Gemini.",
+    });
   }
 });
 
