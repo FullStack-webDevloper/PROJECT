@@ -10,7 +10,7 @@ body{
     font-size: 2rem;
 }
 .navlink{
-    color: #222222, !important;
+    color: #222222 !important;
     background-color: white;
 }
 .f-info-links a{
@@ -104,7 +104,7 @@ opacity: 0;
       display: none;
     }
   }
-  .chat{
+  .chat{ 
     position: fixed;
     bottom: 20px;
     right: 20px;
@@ -114,9 +114,8 @@ opacity: 0;
     border-radius: 50%;
     box-shadow: 0 2px 5px rgba(0,0,0,0.3);
     cursor: pointer;
-    z-index: 1000; /* Ensure it appears above other content */
+    z-index: 1000;
   }
- 
 
 #chatbox {
   position: fixed;
