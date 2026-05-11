@@ -27,7 +27,7 @@ const { GoogleGenAI  } = require("@google/genai");
 const cors = require("cors");
 const bodyParser = require("body-parser");
 const { ChatGoogleGenerativeAI } = require("@langchain/google-genai");
-const {HumanMessage,AIMessage}=require("@langchain/core/messages");
+const {SystemMessage,HumanMessage,AIMessage}=require("@langchain/core/messages");
 // const MONGO_URL="mongodb://127.0.0.1:27017/wanderlust";
 const dbUrl= process.env.ATLASDB_URL;
  
@@ -138,6 +138,7 @@ const model = new ChatGoogleGenerativeAI({
 
 
 // AI Route
+const chatHistory=[];
 app.post("/ask-gemini", async (req, res) => {
 
     try {
@@ -168,7 +169,7 @@ Price: ₹${listing.price}
 
 
         // Prompt
-        const prompt = `
+        const systemPrompt = `
 
 You are an intelligent AI travel assistant.
 
@@ -186,13 +187,24 @@ Instructions:
 - If no listing matches, say it politely
 
         `;
+        if (chatHistory.length === 0) {
 
+      chatHistory.push(
+        new SystemMessage(systemPrompt)
+      );
 
+    }
+
+        chatHistory.push(
+      new HumanMessage(userMessage)
+    );
         // AI Response
-        const response = await model.invoke(prompt);
+        const response = await model.invoke(chatHistory);
 
-
-        console.log(response.content);
+        chatHistory.push(
+      new AIMessage(response.content)
+    );
+        console.log("AI:",response.content);
 
 
         res.json({
@@ -213,29 +225,29 @@ Instructions:
 
 });
 
-app.post("/ask-gemini", async (req, res) => {
-  const userMessage = req.body.message;
+// app.post("/ask-gemini", async (req, res) => {
+//   const userMessage = req.body.message;
 
-  console.log("User message:", userMessage);
+//   console.log("User message:", userMessage);
 
-  try {
-    // LangChain call
-    const response = await model.invoke(userMessage);
+//   try {
+//     // LangChain call
+//     const response = await model.invoke(userMessage);
 
-    console.log("Gemini reply:", response.content);
+//     console.log("Gemini reply:", response.content);
 
-    res.json({
-      reply: response.content,
-    });
+//     res.json({
+//       reply: response.content,
+//     });
 
-  } catch (error) {
-    console.error("Gemini error:", error);
+//   } catch (error) {
+//     console.error("Gemini error:", error);
 
-    res.status(500).json({
-      reply: "Something went wrong with Gemini.",
-    });
-  }
-});
+//     res.status(500).json({
+//       reply: "Something went wrong with Gemini.",
+//     });
+//   }
+// });
 
 app.all("*",(req ,res, next)=>{
 next(new ExpressError(404,"page not found"));
